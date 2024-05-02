@@ -1,0 +1,52 @@
+stages:
+  - build
+  - lint
+  - static
+  - test
+  - release
+
+build_job:
+  stage: build
+  script:
+    - echo "Building project"
+
+lint_backend:
+  stage: lint
+  image: python
+  before_script:
+  #Add requirements.txt for lint to run against
+  script:
+
+
+static_backend:
+  stage: static
+  image: python
+  before_script:
+    - pip install - ./am_framework/requirements.txt
+  script:
+    - mypy
+  tags:
+    - dind
+
+#Unit test for backend
+test_backend:
+  stage: test
+  image: python
+  before_script:
+    #pip install -r ./requirements.txt
+  script:
+    #this should run the integrated django tests
+    - cd backend
+    - python3 manage.py makemigrations
+    - python3 manage.py migrate
+    - python3 manage.py test
+
+  after_script:
+    #record results
+
+#Unit test for frontend
+test_frontend:
+  stage: test
+  script:
+
+

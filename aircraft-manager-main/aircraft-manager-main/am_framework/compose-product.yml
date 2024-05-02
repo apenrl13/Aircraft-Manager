@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.3
+    command: --default-authentication-plugin=caching_sha2_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1qaz2wsx
+      MYSQL_DATABASE: aircraft_manager
+      MYSQL_USER: backend
+      MYSQL_PASSWORD: 1qaz2wsx
+    ports:
+      - "3306:3306"
+    networks:
+      - backend-network
+
+  web:
+    build: .
+    command: >
+      sh -c "export DJANGO_DEBUG=False &&
+            python manage.py wait_for_db &&
+            python manage.py migrate &&
+            gunicorn am_framework.wsgi:application --timeout 600 --bind 0.0.0.0:8080"
+    volumes:
+      - .:/code
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: backend
+      MYSQL_PASSWORD: 1qaz2wsx
+      MYSQL_DB: aircraft_manager
+    networks:
+      - backend-network
+
+volumes:
+  mysql_data:
+
+networks:
+  backend-network:
